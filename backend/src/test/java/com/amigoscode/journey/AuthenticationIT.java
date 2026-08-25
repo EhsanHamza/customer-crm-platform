@@ -112,7 +112,7 @@ public class AuthenticationIT {
         assertThat(customerDTO.name()).isEqualTo(name);
         assertThat(customerDTO.username()).isEqualTo(email);
         assertThat(customerDTO.gender()).isEqualTo(gender);
-        assertThat(customerDTO.roles()).isEqualTo(List.of("ROLE_USER"));
+        assertThat(customerDTO.roles()).isEqualTo(List.of("ROLE_EMPLOYEE"));
 
     }
 }

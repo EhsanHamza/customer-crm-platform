@@ -66,6 +66,10 @@ public class Customer implements UserDetails {
     )
     private String profileImageId;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.ROLE_EMPLOYEE;
+
     public Customer() {
     }
 
@@ -150,13 +154,21 @@ public class Customer implements UserDetails {
         return profileImageId;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
     public void setProfileImageId(String profileImageId) {
         this.profileImageId = profileImageId;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

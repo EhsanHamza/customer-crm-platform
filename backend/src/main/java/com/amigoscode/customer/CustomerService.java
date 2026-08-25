@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Service
 public class CustomerService {
@@ -42,6 +43,31 @@ public class CustomerService {
                 .stream()
                 .map(customerDTOMapper)
                 .collect(Collectors.toList());
+    }
+
+    public CustomerPage searchCustomers(String query, Gender gender, int page, int size, String sort) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        String normalized = query == null ? "" : query.trim().toLowerCase();
+
+        Comparator<CustomerDTO> comparator = switch (sort == null ? "name" : sort) {
+            case "age" -> Comparator.comparing(CustomerDTO::age);
+            case "email" -> Comparator.comparing(CustomerDTO::email, String.CASE_INSENSITIVE_ORDER);
+            default -> Comparator.comparing(CustomerDTO::name, String.CASE_INSENSITIVE_ORDER);
+        };
+
+        List<CustomerDTO> matches = getAllCustomers().stream()
+                .filter(customer -> normalized.isBlank()
+                        || customer.name().toLowerCase().contains(normalized)
+                        || customer.email().toLowerCase().contains(normalized))
+                .filter(customer -> gender == null || customer.gender() == gender)
+                .sorted(comparator)
+                .toList();
+
+        int from = Math.min(safePage * safeSize, matches.size());
+        int to = Math.min(from + safeSize, matches.size());
+        int totalPages = (int) Math.ceil((double) matches.size() / safeSize);
+        return new CustomerPage(matches.subList(from, to), safePage, safeSize, matches.size(), totalPages);
     }
 
     public CustomerDTO getCustomer(Integer id) {
@@ -157,4 +183,3 @@ public class CustomerService {
         return profileImage;
     }
 }
-

@@ -1,0 +1,3 @@
+3-128-247-176.sslip.io {
+    reverse_proxy frontend:80
+}

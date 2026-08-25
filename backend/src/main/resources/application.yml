@@ -9,6 +9,9 @@ cors:
   allowed-headers: "*"
   exposed-headers: "*"
 
+jwt:
+  secret: ${JWT_SECRET:foobar_123456789_foobar_123456789_foobar_123456789_foobar_123456789}
+
 aws:
   region: eu-west-1
   s3:

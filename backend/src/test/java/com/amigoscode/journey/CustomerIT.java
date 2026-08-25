@@ -72,10 +72,11 @@ public class CustomerIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
+                .expectBody(new ParameterizedTypeReference<CustomerPage>() {
                 })
                 .returnResult()
-                .getResponseBody();
+                .getResponseBody()
+                .content();
 
         int id = allCustomers.stream()
                 .filter(customer -> customer.email().equals(email))
@@ -90,7 +91,7 @@ public class CustomerIT {
                 email,
                 gender,
                 age,
-                List.of("ROLE_USER"),
+                List.of("ROLE_EMPLOYEE"),
                 email,
                 null
         );
@@ -162,10 +163,11 @@ public class CustomerIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
+                .expectBody(new ParameterizedTypeReference<CustomerPage>() {
                 })
                 .returnResult()
-                .getResponseBody();
+                .getResponseBody()
+                .content();
 
 
         int id = allCustomers.stream()
@@ -174,14 +176,14 @@ public class CustomerIT {
                 .findFirst()
                 .orElseThrow();
 
-        // customer 2 deletes customer 1
+        // employees cannot delete customers
         webTestClient.delete()
                 .uri(CUSTOMER_PATH + "/{id}", id)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isForbidden();
 
         // customer 2 gets customer 1 by id
         webTestClient.get()
@@ -190,7 +192,7 @@ public class CustomerIT {
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
                 .expectStatus()
-                .isNotFound();
+                .isOk();
     }
 
     @Test
@@ -231,10 +233,11 @@ public class CustomerIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
+                .expectBody(new ParameterizedTypeReference<CustomerPage>() {
                 })
                 .returnResult()
-                .getResponseBody();
+                .getResponseBody()
+                .content();
 
 
         int id = allCustomers.stream()
@@ -279,7 +282,7 @@ public class CustomerIT {
                 email,
                 gender,
                 age,
-                List.of("ROLE_USER"),
+                List.of("ROLE_EMPLOYEE"),
                 email,
                 null
         );
@@ -325,10 +328,11 @@ public class CustomerIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(new ParameterizedTypeReference<CustomerDTO>() {
+                .expectBody(new ParameterizedTypeReference<CustomerPage>() {
                 })
                 .returnResult()
-                .getResponseBody();
+                .getResponseBody()
+                .content();
 
         CustomerDTO customerDTO = allCustomers.stream()
                 .filter(customer -> customer.email().equals(email))

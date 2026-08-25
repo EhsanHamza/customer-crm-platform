@@ -6,11 +6,11 @@ const getAuthConfig = () => ({
     }
 })
 
-export const getCustomers = async () => {
+export const getCustomers = async (params = {}) => {
     try {
         return await axios.get(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`,
-            getAuthConfig()
+            {...getAuthConfig(), params}
         )
     } catch (e) {
         throw e;
@@ -79,3 +79,14 @@ export const uploadCustomerProfilePicture = async (id, formData) => {
 
 export const customerProfilePictureUrl = (id) =>
     `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`;
+
+export const getCustomerInteractions = async (id) => axios.get(
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/interactions`,
+    getAuthConfig()
+);
+
+export const addCustomerInteraction = async (id, interaction) => axios.post(
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/interactions`,
+    interaction,
+    getAuthConfig()
+);

@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class CustomerRowMapper implements RowMapper<Customer> {
     @Override
     public Customer mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Customer(
+        Customer customer = new Customer(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("email"),
@@ -18,5 +18,8 @@ public class CustomerRowMapper implements RowMapper<Customer> {
                 rs.getInt("age"),
                 Gender.valueOf(rs.getString("gender")),
                 rs.getString("profile_image_id"));
+        String role = rs.getString("role");
+        customer.setRole(role == null ? Role.ROLE_EMPLOYEE : Role.valueOf(role));
+        return customer;
     }
 }
