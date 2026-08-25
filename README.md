@@ -1,30 +1,99 @@
-# Full Stack Professional
+# Customer CRM Platform
 
-Enrol [here](https://amigoscode.com/courses/full-stack-professional) with over *50 Hours* of Content with Plenty of Exercises
+A full-stack customer relationship management application for securely organizing customer records and tracking communication history. The application includes authenticated access, role-based permissions, customer search and pagination, profile images, and production-ready cloud deployment.
 
-![Curriculum](https://user-images.githubusercontent.com/40702606/228275106-73076517-ff4f-40e0-a993-4d05d5a2ea77.png)
+## Live Demo
 
-Are you ready to level up your coding skills and become a full stack professional? Our new 50+ hours course is designed to equip you with the latest tools and techniques to build impressive, full stack applications that will impress the users and your team.
+[Open the deployed application](https://3-128-247-176.sslip.io)
 
-Over the next three months you will learn how to craft stunning, responsive front-end interfaces that flawlessly communicate with robust, scalable back-end servers, all with the use of industry-standard technologies such as:
+> The demo is hosted on an AWS EC2 instance. Availability may vary while the instance is stopped or restarted.
 
-- ✅ Spring Boot 3
-- ✅ HTTP & API development
-- ✅ Developer tools for maximum productivity
-- ✅ Robust error handling techniques
-- ✅ Databases & PostgreSQL
-- ✅ Spring Data JPA
-- ✅ Flyway for seamless database migrations
-- ✅ JDBC for efficient database communication
-- ✅ Testing strategies for robust, reliable code
-- ✅ Docker for containerization and deployment
-- ✅ AWS for cloud-based hosting and scaling
-- ✅ DevOps best practices for agile, collaborative development
-- ✅ JavaScript and React for front-end development
-- ✅ Spring Security 6 for secure, authenticated applications
-- ✅ Login/Registration systems for user management
-- ✅ TypeScript for type-safe, scalable code
-- ✅ Angular for powerful, responsive front-end interfaces
+## Features
 
-🎁 Bonus 6-Month IntelliJ IDEA Ultimate license worth 117.83$
+- Account registration and JWT-based authentication
+- Admin and employee roles with role-based authorization
+- Create, view, update, and delete customer records
+- Search and filter customers by name, email, and gender
+- Sort and paginate customer results
+- Record customer notes, calls, emails, meetings, and follow-ups
+- Upload and retrieve customer profile images
+- Responsive React dashboard built with Chakra UI
+- PostgreSQL schema management with Flyway migrations
+- Automated backend unit and integration tests with GitHub Actions
+- Containerized production deployment with Docker Compose
+- HTTPS reverse proxy and automatic TLS through Caddy
 
+## Technology Stack
+
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React, Vite, Chakra UI, Axios |
+| Backend | Java, Spring Boot, Spring Security, JWT, Spring Data JPA, JDBC |
+| Database | PostgreSQL, Flyway |
+| File storage | AWS S3 integration with a local mock-storage option |
+| Testing | JUnit, Mockito, Testcontainers |
+| DevOps | Docker, Docker Compose, GitHub Actions, Caddy |
+| Cloud | AWS EC2 |
+
+## Architecture
+
+The React frontend sends authenticated REST API requests to the Spring Boot backend. The backend applies role-based authorization, manages customer and interaction data in PostgreSQL, and handles profile-image storage. In production, Caddy terminates HTTPS traffic and routes requests to the containerized frontend and backend services.
+
+## Run with Docker
+
+### Requirements
+
+- Docker with Docker Compose
+- Git
+
+### Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/EhsanHamza/customer-crm-platform.git
+   cd customer-crm-platform
+   ```
+
+2. Create the production environment file:
+
+   ```bash
+   cp .env.production.example .env
+   ```
+
+3. Replace the placeholder values in `.env`. Keep `S3_MOCK=true` to store profile images locally.
+
+4. Update the hostname in `Caddyfile` for your server or domain.
+
+5. Build and start the application:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d --build
+   ```
+
+6. View the running services:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml ps
+   ```
+
+## Continuous Integration and Deployment
+
+Backend tests run automatically for pull requests. The production deployment workflow can deploy changes from `main` to an EC2 instance after the following GitHub repository secrets are configured:
+
+- `EC2_HOST` — the EC2 public hostname or IP address
+- `EC2_SSH_KEY` — the private SSH key used by GitHub Actions
+
+Secrets such as database passwords, JWT keys, and SSH keys are intentionally excluded from the repository.
+
+## Future Improvements
+
+- Configure a dedicated AWS S3 bucket and EC2 IAM role for production file storage
+- Add customer analytics and dashboard reporting
+- Add interaction reminders and notification scheduling
+- Add refresh tokens and password recovery
+- Add end-to-end frontend tests
+
+## Project Background
+
+This project began with the [Amigoscode Full Stack Professional](https://github.com/amigoscode/full-stack-professional) course project. I extended and deployed it as a CRM platform by adding customer interaction tracking, role-based permissions, search, filtering, sorting, pagination, production containers, HTTPS, AWS EC2 deployment, and an automated CI/CD workflow.
