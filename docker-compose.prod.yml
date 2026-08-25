@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:14.1-alpine
+    environment:
+      POSTGRES_DB: customer
+      POSTGRES_USER: amigoscode
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U amigoscode -d customer"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+      SPRING_DATASOURCE_USERNAME: amigoscode
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      AWS_REGION: us-east-2
+      AWS_S3_MOCK: ${S3_MOCK:-true}
+      AWS_S3_BUCKETS_CUSTOMER: ${S3_BUCKET_NAME:-local-customer-files}
+      CORS_ALLOWED_ORIGINS: "*"
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - profile_images:/root/.amigoscode/s3
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/react
+      args:
+        VITE_API_BASE_URL: ""
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2.8-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  profile_images:
+  caddy_data:
+  caddy_config:

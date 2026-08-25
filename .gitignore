@@ -44,3 +44,4 @@ typings
 !.vscode/tasks.json
 !.vscode/launch.json
 .history/*
+.env

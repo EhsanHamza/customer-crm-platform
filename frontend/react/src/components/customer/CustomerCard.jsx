@@ -19,8 +19,12 @@ import {useRef} from 'react'
 import {customerProfilePictureUrl, deleteCustomer} from "../../services/client.js";
 import {errorNotification, successNotification} from "../../services/notification.js";
 import UpdateCustomerDrawer from "./UpdateCustomerDrawer.jsx";
+import CustomerInteractionsDrawer from "./CustomerInteractionsDrawer.jsx";
+import {useAuth} from "../context/AuthContext.jsx";
 
 export default function CardWithImage({id, name, email, age, gender, imageNumber, fetchCustomers}) {
+    const {customer} = useAuth();
+    const isAdmin = customer?.roles?.includes("ROLE_ADMIN");
     const randomUserGender = gender === "MALE" ? "men" : "women";
 
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -68,12 +72,15 @@ export default function CardWithImage({id, name, email, age, gender, imageNumber
                 </Box>
                 <Stack direction={'row'} justify={'center'} spacing={6} p={4}>
                     <Stack>
+                        <CustomerInteractionsDrawer customerId={id} customerName={name}/>
+                    </Stack>
+                    {isAdmin && <Stack>
                         <UpdateCustomerDrawer
                             initialValues={{ name, email, age }}
                             customerId={id}
                             fetchCustomers={fetchCustomers}
                         />
-                    </Stack>
+                    </Stack>}
                     <Stack>
                         <Button
                             bg={'red.400'}

@@ -1,0 +1,39 @@
+name: Deploy CRM to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package application
+        run: tar --exclude=.git --exclude=.env -czf release.tgz .
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+
+      - name: Upload and deploy
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          scp -i ~/.ssh/ec2_key release.tgz ubuntu@"$EC2_HOST":/home/ubuntu/release.tgz
+          ssh -i ~/.ssh/ec2_key ubuntu@"$EC2_HOST" <<'REMOTE'
+            set -e
+            mkdir -p /home/ubuntu/full-stack-professional
+            tar -xzf /home/ubuntu/release.tgz -C /home/ubuntu/full-stack-professional
+            cd /home/ubuntu/full-stack-professional
+            sudo docker compose -f docker-compose.prod.yml up -d --build
+            sudo docker image prune -f
+          REMOTE

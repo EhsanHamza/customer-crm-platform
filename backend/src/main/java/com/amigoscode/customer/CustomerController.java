@@ -23,8 +23,13 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<CustomerDTO> getCustomers() {
-        return customerService.getAllCustomers();
+    public CustomerPage getCustomers(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Gender gender,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "name") String sort) {
+        return customerService.searchCustomers(query, gender, page, size, sort);
     }
 
     @GetMapping("{customerId}")
@@ -37,7 +42,7 @@ public class CustomerController {
     public ResponseEntity<?> registerCustomer(
             @RequestBody CustomerRegistrationRequest request) {
         customerService.addCustomer(request);
-        String jwtToken = jwtUtil.issueToken(request.email(), "ROLE_USER");
+        String jwtToken = jwtUtil.issueToken(request.email(), Role.ROLE_EMPLOYEE.name());
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
                 .build();
