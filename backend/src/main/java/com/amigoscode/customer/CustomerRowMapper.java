@@ -18,7 +18,8 @@ public class CustomerRowMapper implements RowMapper<Customer> {
                 rs.getInt("age"),
                 Gender.valueOf(rs.getString("gender")),
                 rs.getString("profile_image_id"));
-        customer.setRole(Role.valueOf(rs.getString("role")));
+        String role = rs.getString("role");
+        customer.setRole(role == null ? Role.ROLE_EMPLOYEE : Role.valueOf(role));
         return customer;
     }
 }
